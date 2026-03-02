@@ -26,7 +26,7 @@
   .spaces-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; }
   .space-card { background: #fff; border-radius: 14px; padding: 16px; box-shadow: 0 2px 12px rgba(0,0,0,.07); display: flex; flex-direction: column; gap: 8px; transition: transform .2s; }
   .space-card:hover { transform: translateY(-2px); }
-  .space-icon { font-size: 38px; text-align: center; }
+  .space-icon { font-size: 42px; text-align: center; }
   .space-name { font-size: 18px; font-weight: 800; text-align: center; }
   .space-desc { font-size: 12px; color: #999; text-align: center; }
   .timeline { display: flex; height: 14px; border-radius: 8px; overflow: hidden; gap: 1px; margin-top: 4px; }
@@ -185,10 +185,10 @@ const SUPABASE_KEY = "sb_publishable_gv-CDhhwfo2NTi3HH0-cpg_qH9SIrzd";
 const ADMIN_CODE = "kibbutz2024";
 
 const SPACES = [
-  { id: "sport",   name: "ספורט", icon: "⚽", color: "#2ECC71", desc: "מגרש ספורט מלא" },
-  { id: "shmootz", name: "שמוצ",  icon: "🎭", color: "#E67E22", desc: "חדר שמוצ ויצירה" },
-  { id: "yoga",    name: "יוגה",  icon: "🧘", color: "#9B59B6", desc: "סטודיו יוגה ומדיטציה" },
-  { id: "hall",    name: "אולם",  icon: "🏛️", color: "#3498DB", desc: "אולם אירועים גדול" },
+  { id: "sport",   name: "ספורט", icon: "🤸", color: "#2ECC71" },
+  { id: "shmootz", name: "שמוצ",  icon: "✡️",  color: "#E67E22" },
+  { id: "yoga",    name: "יוגה",  icon: "🧘", color: "#9B59B6" },
+  { id: "hall",    name: "אולם",  icon: "🏀", color: "#3498DB" },
 ];
 const HOURS = Array.from({length:16}, (_,i) => i+7); // 7-22
 const fmtH = h => String(h).padStart(2,'0') + ':00';
@@ -274,7 +274,7 @@ function renderSpaces() {
       <div class="space-card" style="border-top:4px solid ${sp.color}">
         <div class="space-icon">${sp.icon}</div>
         <div class="space-name">${sp.name}</div>
-        <div class="space-desc">${sp.desc}</div>
+
         <div class="timeline">${timeline}</div>
         <div class="timeline-labels"><span>07:00</span><span>22:00</span></div>
         <div class="booking-stats">${stats}</div>

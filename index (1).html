@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>שיתוף חללים • קיבוץ שמיר</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Heebo', sans-serif; background: #f0f2f5; color: #1a1a2e; min-height: 100vh; }
+
+  .hero { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: #fff; padding: 28px 20px; text-align: center; }
+  .hero h1 { font-size: 28px; font-weight: 900; letter-spacing: 1px; }
+  .hero p { font-size: 14px; opacity: 0.65; margin-top: 4px; }
+
+  .page { max-width: 860px; margin: 0 auto; padding: 16px; }
+
+  .success-banner { background: #27AE60; color: #fff; padding: 12px 20px; border-radius: 10px; margin-bottom: 16px; text-align: center; font-size: 15px; font-weight: 700; animation: fadeIn .4s; }
+  .error-banner { background: #E74C3C; color: #fff; padding: 12px 20px; border-radius: 10px; margin-bottom: 16px; text-align: center; font-size: 14px; }
+
+  .date-row { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+  .date-row label { font-weight: 700; font-size: 15px; }
+  .date-row input { padding: 8px 12px; border-radius: 8px; border: 2px solid #ddd; font-size: 14px; font-family: inherit; }
+  .refresh-btn { background: #eee; border: none; border-radius: 8px; padding: 8px 14px; cursor: pointer; font-size: 16px; }
+
+  .spaces-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; }
+  .space-card { background: #fff; border-radius: 14px; padding: 16px; box-shadow: 0 2px 12px rgba(0,0,0,.07); display: flex; flex-direction: column; gap: 8px; transition: transform .2s; }
+  .space-card:hover { transform: translateY(-2px); }
+  .space-icon { font-size: 38px; text-align: center; }
+  .space-name { font-size: 18px; font-weight: 800; text-align: center; }
+  .space-desc { font-size: 12px; color: #999; text-align: center; }
+  .timeline { display: flex; height: 14px; border-radius: 8px; overflow: hidden; gap: 1px; margin-top: 4px; }
+  .hour-cell { flex: 1; cursor: help; transition: opacity .2s; }
+  .timeline-labels { display: flex; justify-content: space-between; font-size: 10px; color: #bbb; }
+  .booking-stats { display: flex; gap: 8px; font-size: 11px; flex-wrap: wrap; min-height: 16px; }
+  .book-btn { color: #fff; border: none; border-radius: 8px; padding: 9px 0; font-weight: 800; font-size: 14px; cursor: pointer; margin-top: 4px; font-family: inherit; transition: opacity .2s; }
+  .book-btn:hover { opacity: .88; }
+
+  .admin-link { text-align: center; margin-top: 28px; color: #aaa; cursor: pointer; font-size: 13px; padding: 8px; }
+  .admin-link:hover { color: #555; }
+
+  /* FORM */
+  .back-btn { color: #3498DB; cursor: pointer; margin-bottom: 14px; display: inline-block; font-weight: 700; font-size: 15px; }
+  .form-card { background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,.1); }
+  .form-header { padding: 20px 24px; color: #fff; display: flex; align-items: center; gap: 14px; }
+  .form-header .fh-icon { font-size: 36px; }
+  .form-header .fh-title { font-size: 20px; font-weight: 900; }
+  .form-header .fh-date { opacity: .8; font-size: 13px; margin-top: 2px; }
+  .form-body { padding: 22px; }
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-weight: 700; margin-bottom: 5px; font-size: 13px; }
+  .field input, .field textarea, .field select { width: 100%; padding: 10px 13px; border-radius: 8px; border: 2px solid #e5e5e5; font-size: 14px; font-family: inherit; outline: none; transition: border .2s; }
+  .field input:focus, .field textarea:focus { border-color: #3498DB; }
+  .field textarea { height: 75px; resize: vertical; }
+
+  .hours-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 8px; }
+  .hour-block { padding: 8px 4px; border-radius: 7px; text-align: center; font-size: 12px; font-weight: 700; cursor: pointer; transition: all .15s; user-select: none; }
+  .selected-time { margin-top: 8px; font-size: 13px; color: #555; background: #f7f7f7; padding: 8px 12px; border-radius: 8px; }
+
+  .upload-area { border: 2px dashed #ddd; border-radius: 10px; padding: 18px; text-align: center; cursor: pointer; color: #aaa; min-height: 75px; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 6px; font-size: 14px; }
+  .upload-area img { max-width: 100%; max-height: 140px; border-radius: 8px; }
+
+  .submit-btn { width: 100%; padding: 13px; color: #fff; border: none; border-radius: 10px; font-size: 16px; font-weight: 800; cursor: pointer; margin-top: 6px; font-family: inherit; transition: opacity .2s; }
+  .submit-btn:hover { opacity: .88; }
+  .submit-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+  /* LOGIN */
+  .login-card { background: #fff; border-radius: 16px; padding: 32px; max-width: 360px; margin: 60px auto; box-shadow: 0 4px 24px rgba(0,0,0,.1); }
+  .login-title { font-size: 22px; font-weight: 900; text-align: center; margin-bottom: 20px; }
+  .login-err { color: #E74C3C; text-align: center; font-size: 13px; margin-top: 4px; }
+
+  /* ADMIN */
+  .admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; background: #fff; padding: 14px 18px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.07); }
+  .admin-title { font-size: 20px; font-weight: 900; }
+  .admin-sub { color: #F39C12; font-size: 13px; font-weight: 700; margin-top: 2px; }
+  .logout-btn { background: #E74C3C; color: #fff; border: none; border-radius: 8px; padding: 8px 14px; cursor: pointer; font-weight: 700; font-family: inherit; }
+
+  .admin-card { background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+  .admin-card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .space-badge { font-size: 15px; font-weight: 800; display: flex; gap: 6px; align-items: center; }
+  .status-badge { color: #fff; padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: 800; }
+  .admin-details { display: grid; grid-template-columns: 1fr 1fr; gap: 5px 14px; font-size: 13px; margin-bottom: 10px; }
+  .admin-details .full { grid-column: 1/-1; }
+  .phone-link { color: #3498DB; text-decoration: none; font-weight: 700; }
+  .admin-actions { display: flex; gap: 8px; margin-top: 10px; }
+  .action-btn { flex: 1; padding: 9px; color: #fff; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; font-size: 14px; font-family: inherit; }
+  .delete-btn { margin-top: 6px; background: none; border: 1px solid #eee; border-radius: 6px; padding: 4px 12px; cursor: pointer; color: #bbb; font-size: 11px; font-family: inherit; }
+  .empty { text-align: center; color: #bbb; font-size: 17px; margin-top: 50px; padding: 40px; }
+  .loading { text-align: center; color: #aaa; padding: 40px; font-size: 17px; }
+
+  .hidden { display: none !important; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 480px) {
+    .spaces-grid { grid-template-columns: 1fr 1fr; }
+    .admin-details { grid-template-columns: 1fr; }
+    .hours-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>🏕️ שיתוף חללים</h1>
+  <p>קיבוץ שמיר • הזמן חלל לפעילות שלך</p>
+</div>
+
+<!-- HOME VIEW -->
+<div id="view-home" class="page">
+  <div id="success-banner" class="success-banner hidden"></div>
+  <div class="date-row">
+    <label>📅 בחר תאריך:</label>
+    <input type="date" id="selected-date" />
+    <button class="refresh-btn" onclick="fetchBookings()">🔄</button>
+  </div>
+  <div id="spaces-grid" class="spaces-grid"></div>
+  <div class="admin-link" onclick="goAdmin()">🔐 כניסת מנהל</div>
+</div>
+
+<!-- BOOK VIEW -->
+<div id="view-book" class="page hidden">
+  <div class="back-btn" onclick="showView('home')">← חזרה</div>
+  <div class="form-card">
+    <div class="form-header" id="form-header">
+      <span class="fh-icon" id="fh-icon"></span>
+      <div>
+        <div class="fh-title" id="fh-title"></div>
+        <div class="fh-date" id="fh-date"></div>
+      </div>
+    </div>
+    <div class="form-body">
+      <div class="field"><label>שם הקבוצה *</label><input id="f-group" placeholder="לדוגמה: קבוצת ספורט ג'" /></div>
+      <div class="field"><label>כמות משתתפים *</label><input id="f-count" type="number" min="1" placeholder="מספר אנשים" /></div>
+      <div class="field"><label>שם אחראי קבוצה *</label><input id="f-responsible" placeholder="שם מלא" /></div>
+      <div class="field"><label>טלפון אחראי *</label><input id="f-phone" type="tel" placeholder="050-0000000" /></div>
+      <div class="field">
+        <label>שעות הפעילות</label>
+        <div class="hours-grid" id="hours-grid"></div>
+        <div class="selected-time" id="selected-time">נבחר: 08:00 – 10:00<br><small style="color:#bbb">לחץ שעת התחלה → שעת סיום</small></div>
+      </div>
+      <div class="field"><label>הערות מיוחדות</label><textarea id="f-notes" placeholder="דרישות מיוחדות, ציוד נדרש וכו'"></textarea></div>
+      <div class="field">
+        <label>תמונת סיום פעילות (אופציונלי)</label>
+        <div class="upload-area" id="upload-area" onclick="document.getElementById('f-image').click()">
+          <span>📷 לחץ לצירוף תמונה</span>
+        </div>
+        <input type="file" id="f-image" accept="image/*" style="display:none" onchange="handleImage(this)" />
+      </div>
+      <button class="submit-btn" id="submit-btn" onclick="submitBooking()">שלח הזמנה ←</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN VIEW -->
+<div id="view-login" class="page hidden">
+  <div class="back-btn" onclick="showView('home')">← חזרה</div>
+  <div class="login-card">
+    <div class="login-title">🔐 כניסת מנהל</div>
+    <div class="field"><input type="password" id="admin-pass" placeholder="קוד גישה" onkeydown="if(event.key==='Enter')tryLogin()" /></div>
+    <div class="login-err hidden" id="login-err">קוד שגוי</div>
+    <button class="submit-btn" style="background:#0f3460" onclick="tryLogin()">כניסה</button>
+  </div>
+</div>
+
+<!-- ADMIN VIEW -->
+<div id="view-admin" class="page hidden">
+  <div class="admin-header">
+    <div>
+      <div class="admin-title">🔧 פאנל ניהול</div>
+      <div class="admin-sub" id="pending-count"></div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="refresh-btn" onclick="fetchBookings();renderAdmin()">🔄 רענן</button>
+      <button class="logout-btn" onclick="isAdmin=false;showView('home')">יציאה</button>
+    </div>
+  </div>
+  <div id="admin-list"></div>
+</div>
+
+<script>
+// ===== CONFIG =====
+const SUPABASE_URL = "https://rbcsbazphttdqfbzpvsj.supabase.co";
+const SUPABASE_KEY = "sb_publishable_gv-CDhhwfo2NTi3HH0-cpg_qH9SIrzd";
+const ADMIN_CODE = "kibbutz2024";
+
+const SPACES = [
+  { id: "sport",   name: "ספורט", icon: "⚽", color: "#2ECC71", desc: "מגרש ספורט מלא" },
+  { id: "shmootz", name: "שמוצ",  icon: "🎭", color: "#E67E22", desc: "חדר שמוצ ויצירה" },
+  { id: "yoga",    name: "יוגה",  icon: "🧘", color: "#9B59B6", desc: "סטודיו יוגה ומדיטציה" },
+  { id: "hall",    name: "אולם",  icon: "🏛️", color: "#3498DB", desc: "אולם אירועים גדול" },
+];
+const HOURS = Array.from({length:16}, (_,i) => i+7); // 7-22
+const fmtH = h => String(h).padStart(2,'0') + ':00';
+const todayStr = () => new Date().toISOString().split('T')[0];
+
+// ===== STATE =====
+let bookings = [];
+let isAdmin = false;
+let selectedSpace = null;
+let bookStartHour = 8;
+let bookEndHour = 10;
+let imagePreview = null;
+
+// ===== SUPABASE =====
+async function sbFetch(path, opts={}) {
+  const res = await fetch(SUPABASE_URL + path, {
+    ...opts,
+    headers: { apikey: SUPABASE_KEY, Authorization: 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json', ...(opts.headers||{}) }
+  });
+  if (res.status === 204 || res.headers.get('content-length') === '0') return null;
+  return res.json();
+}
+
+async function fetchBookings() {
+  try {
+    const data = await sbFetch('/rest/v1/bookings?order=created_at.desc');
+    if (Array.isArray(data)) bookings = data;
+    renderSpaces();
+    if (isAdmin) renderAdmin();
+  } catch(e) { console.error(e); }
+}
+
+async function insertBooking(b) {
+  return sbFetch('/rest/v1/bookings', { method:'POST', headers:{ Prefer:'return=representation' }, body: JSON.stringify(b) });
+}
+
+async function updateStatus(id, status) {
+  return sbFetch(`/rest/v1/bookings?id=eq.${id}`, { method:'PATCH', body: JSON.stringify({status}) });
+}
+
+async function deleteBooking(id) {
+  return sbFetch(`/rest/v1/bookings?id=eq.${id}`, { method:'DELETE' });
+}
+
+// ===== HELPERS =====
+function getSpaceBookings(spaceId, date) {
+  return bookings.filter(b => b.space_id === spaceId && b.date === date && b.status !== 'rejected');
+}
+function isHourTaken(spaceId, date, hour) {
+  return getSpaceBookings(spaceId, date).some(b => hour >= b.start_hour && hour < b.end_hour);
+}
+function statusColor(s) { return {pending:'#F39C12', approved:'#27AE60', rejected:'#E74C3C'}[s]||'#ccc'; }
+function statusLabel(s) { return {pending:'ממתין לאישור', approved:'מאושר ✓', rejected:'נדחה ✗'}[s]||s; }
+
+// ===== VIEWS =====
+function showView(name) {
+  ['home','book','login','admin'].forEach(v => document.getElementById('view-'+v).classList.toggle('hidden', v!==name));
+}
+
+function goAdmin() {
+  if (isAdmin) { renderAdmin(); showView('admin'); }
+  else showView('login');
+}
+
+// ===== HOME =====
+function renderSpaces() {
+  const date = document.getElementById('selected-date').value;
+  const grid = document.getElementById('spaces-grid');
+  grid.innerHTML = SPACES.map(sp => {
+    const approved = getSpaceBookings(sp.id, date).filter(b=>b.status==='approved');
+    const pending  = getSpaceBookings(sp.id, date).filter(b=>b.status==='pending');
+    const timeline = HOURS.map(h => {
+      const b = getSpaceBookings(sp.id, date).find(bk => h>=bk.start_hour && h<bk.end_hour);
+      const bg = b ? (b.status==='approved' ? sp.color : '#F39C12') : '#eee';
+      const tip = b ? `${b.group_name} (${statusLabel(b.status)}) ${fmtH(b.start_hour)}-${fmtH(b.end_hour)}` : fmtH(h);
+      return `<div class="hour-cell" style="background:${bg}" title="${tip}"></div>`;
+    }).join('');
+    const stats = approved.length || pending.length
+      ? (approved.length ? `<span style="color:${sp.color}">✓ ${approved.length} מאושרות</span>` : '') +
+        (pending.length  ? `<span style="color:#F39C12">⏳ ${pending.length} ממתינות</span>` : '')
+      : '<span style="color:#bbb">פנוי לחלוטין</span>';
+    return `
+      <div class="space-card" style="border-top:4px solid ${sp.color}">
+        <div class="space-icon">${sp.icon}</div>
+        <div class="space-name">${sp.name}</div>
+        <div class="space-desc">${sp.desc}</div>
+        <div class="timeline">${timeline}</div>
+        <div class="timeline-labels"><span>07:00</span><span>22:00</span></div>
+        <div class="booking-stats">${stats}</div>
+        <button class="book-btn" style="background:${sp.color}" onclick="openBook('${sp.id}')">הזמן חלל</button>
+      </div>`;
+  }).join('');
+}
+
+// ===== BOOK =====
+function openBook(spaceId) {
+  selectedSpace = spaceId;
+  bookStartHour = 8; bookEndHour = 10; imagePreview = null;
+  const sp = SPACES.find(s=>s.id===spaceId);
+  document.getElementById('fh-icon').textContent = sp.icon;
+  document.getElementById('fh-title').textContent = 'הזמנת חלל: ' + sp.name;
+  document.getElementById('fh-date').textContent = document.getElementById('selected-date').value;
+  document.getElementById('form-header').style.background = sp.color;
+  document.getElementById('submit-btn').style.background = sp.color;
+  document.getElementById('upload-area').innerHTML = '<span>📷 לחץ לצירוף תמונה</span>';
+  ['f-group','f-count','f-responsible','f-phone','f-notes'].forEach(id => document.getElementById(id).value='');
+  renderHoursGrid();
+  showView('book');
+}
+
+function renderHoursGrid() {
+  const date = document.getElementById('selected-date').value;
+  const grid = document.getElementById('hours-grid');
+  grid.innerHTML = HOURS.map(h => {
+    const taken    = isHourTaken(selectedSpace, date, h);
+    const selected = h >= bookStartHour && h < bookEndHour;
+    const sp = SPACES.find(s=>s.id===selectedSpace);
+    const bg    = taken ? '#ffcdd2' : selected ? sp.color : '#f0f0f0';
+    const color = taken ? '#c62828' : selected ? '#fff' : '#333';
+    const cursor = taken ? 'not-allowed' : 'pointer';
+    return `<div class="hour-block" style="background:${bg};color:${color};cursor:${cursor}" onclick="selectHour(${h},${taken})">${fmtH(h)}</div>`;
+  }).join('');
+  document.getElementById('selected-time').innerHTML = `נבחר: ${fmtH(bookStartHour)} – ${fmtH(bookEndHour)}<br><small style="color:#bbb">לחץ שעת התחלה → שעת סיום</small>`;
+}
+
+let pickingEnd = false;
+function selectHour(h, taken) {
+  if (taken) return;
+  if (!pickingEnd) { bookStartHour = h; bookEndHour = h+1; pickingEnd = true; }
+  else { if (h > bookStartHour) bookEndHour = h+1; else bookStartHour = h; pickingEnd = false; }
+  renderHoursGrid();
+}
+
+function handleImage(input) {
+  const file = input.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    imagePreview = e.target.result;
+    document.getElementById('upload-area').innerHTML = `<img src="${imagePreview}" />`;
+  };
+  reader.readAsDataURL(file);
+}
+
+async function submitBooking() {
+  const g = v => document.getElementById(v).value.trim();
+  if (!g('f-group')||!g('f-count')||!g('f-responsible')||!g('f-phone')) return alert('נא למלא את כל השדות החובה');
+  if (bookEndHour <= bookStartHour) return alert('שעת סיום חייבת להיות אחרי שעת התחלה');
+  const date = document.getElementById('selected-date').value;
+  for (let h=bookStartHour; h<bookEndHour; h++) {
+    if (isHourTaken(selectedSpace, date, h)) return alert('קיימת הזמנה חופפת בשעות שנבחרו');
+  }
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true; btn.textContent = 'שולח...';
+  const newB = {
+    id: Date.now().toString(), space_id: selectedSpace, date,
+    group_name: g('f-group'), count: g('f-count'), responsible: g('f-responsible'),
+    phone: g('f-phone'), notes: g('f-notes'), image_preview: imagePreview,
+    start_hour: bookStartHour, end_hour: bookEndHour, status: 'pending'
+  };
+  await insertBooking(newB);
+  await fetchBookings();
+  btn.disabled = false; btn.textContent = 'שלח הזמנה ←';
+  showView('home');
+  showSuccess('ההזמנה נשלחה! ממתינה לאישור מנהל 🎉');
+  pickingEnd = false;
+}
+
+// ===== LOGIN =====
+function tryLogin() {
+  const pass = document.getElementById('admin-pass').value;
+  if (pass === ADMIN_CODE) {
+    isAdmin = true;
+    document.getElementById('admin-pass').value = '';
+    renderAdmin(); showView('admin');
+  } else {
+    document.getElementById('login-err').classList.remove('hidden');
+  }
+}
+
+// ===== ADMIN =====
+function renderAdmin() {
+  const pending = bookings.filter(b=>b.status==='pending');
+  document.getElementById('pending-count').textContent = pending.length + ' הזמנות ממתינות לאישור';
+  const list = document.getElementById('admin-list');
+  if (!bookings.length) { list.innerHTML = '<div class="empty">אין הזמנות עדיין</div>'; return; }
+  list.innerHTML = bookings.map(b => {
+    const sp = SPACES.find(s=>s.id===b.space_id);
+    if (!sp) return '';
+    const actions = b.status === 'pending'
+      ? `<div class="admin-actions">
+           <button class="action-btn" style="background:#27AE60" onclick="adminAction('${b.id}','approved')">✓ אשר הזמנה</button>
+           <button class="action-btn" style="background:#E74C3C" onclick="adminAction('${b.id}','rejected')">✗ דחה הזמנה</button>
+         </div>` : '';
+    const img = b.image_preview ? `<img src="${b.image_preview}" style="width:100%;max-height:180px;object-fit:cover;border-radius:8px;margin-top:8px" />` : '';
+    return `
+      <div class="admin-card" style="border-right:5px solid ${statusColor(b.status)}">
+        <div class="admin-card-top">
+          <div class="space-badge">${sp.icon} ${sp.name}</div>
+          <div class="status-badge" style="background:${statusColor(b.status)}">${statusLabel(b.status)}</div>
+        </div>
+        <div class="admin-details">
+          <div><strong>קבוצה:</strong> ${b.group_name}</div>
+          <div><strong>אחראי:</strong> ${b.responsible}</div>
+          <div><strong>טלפון:</strong> <a class="phone-link" href="tel:${b.phone}">${b.phone} 📞</a></div>
+          <div><strong>כמות:</strong> ${b.count} משתתפים</div>
+          <div><strong>תאריך:</strong> ${b.date}</div>
+          <div><strong>שעות:</strong> ${fmtH(b.start_hour)} – ${fmtH(b.end_hour)}</div>
+          ${b.notes ? `<div class="full"><strong>הערות:</strong> ${b.notes}</div>` : ''}
+        </div>
+        ${img}
+        ${actions}
+        <button class="delete-btn" onclick="adminDelete('${b.id}')">🗑️ מחק</button>
+      </div>`;
+  }).join('');
+}
+
+async function adminAction(id, status) {
+  await updateStatus(id, status);
+  bookings = bookings.map(b => b.id===id ? {...b, status} : b);
+  renderAdmin(); renderSpaces();
+}
+
+async function adminDelete(id) {
+  if (!confirm('למחוק הזמנה זו?')) return;
+  await deleteBooking(id);
+  bookings = bookings.filter(b => b.id!==id);
+  renderAdmin(); renderSpaces();
+}
+
+// ===== SUCCESS =====
+function showSuccess(msg) {
+  const el = document.getElementById('success-banner');
+  el.textContent = msg; el.classList.remove('hidden');
+  setTimeout(() => el.classList.add('hidden'), 4000);
+}
+
+// ===== INIT =====
+document.getElementById('selected-date').value = todayStr();
+document.getElementById('selected-date').min = todayStr();
+document.getElementById('selected-date').addEventListener('change', () => { renderSpaces(); });
+fetchBookings();
+</script>
+</body>
+</html>
